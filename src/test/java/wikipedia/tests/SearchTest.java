@@ -18,7 +18,7 @@ public class SearchTest extends TestBase {
                     .clickSearch()
                     .closeTooltipIfVisible()
                     .typeQuery("Java")
-                    .clickFirstSnippet("Java")
+                    .clickFirstSnippet() // <-- Убрали параметр "Java"
                     .checkArticleTitle("Java");
         });
     }
@@ -32,7 +32,7 @@ public class SearchTest extends TestBase {
                     .clickSearch()
                     .closeTooltipIfVisible()
                     .typeQuery("Python")
-                    .clickFirstSnippet("Python")
+                    .clickFirstSnippet() // <-- Убрали параметр "Python"
                     .checkArticleTitle("Python");
         });
     }
