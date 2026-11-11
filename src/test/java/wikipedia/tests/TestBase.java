@@ -3,6 +3,7 @@ package wikipedia.tests;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.WebDriverRunner;
 import com.codeborne.selenide.logevents.SelenideLogger;
+import io.appium.java_client.android.AndroidDriver;
 import io.qameta.allure.Allure;
 import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.AfterEach;
@@ -11,8 +12,9 @@ import org.junit.jupiter.api.BeforeEach;
 import wikipedia.drivers.AndroidDriverProvider;
 
 import java.io.ByteArrayInputStream;
+import java.util.Base64;
 
-import static com.codeborne.selenide.Selenide.*;
+import static com.codeborne.selenide.Selenide.closeWebDriver;
 
 public class TestBase {
 
@@ -35,17 +37,32 @@ public class TestBase {
         SelenideLogger.addListener("AllureSelenide", new AllureSelenide()
                 .screenshots(true)
                 .savePageSource(false));
-        open();
+
+        com.codeborne.selenide.Selenide.open();
+
+        try {
+            ((AndroidDriver) WebDriverRunner.getWebDriver()).startRecordingScreen();
+        } catch (Exception e) {
+            System.out.println("Не удалось начать запись видео: " + e.getMessage());
+        }
     }
 
     @AfterEach
     void afterEach() {
         if (WebDriverRunner.hasWebDriverStarted()) {
             try {
-                byte[] screenshotBytes = screenshot("final_screenshot").getBytes();
+
+                String videoBase64 = ((AndroidDriver) WebDriverRunner.getWebDriver()).stopRecordingScreen();
+                if (videoBase64 != null && !videoBase64.isEmpty()) {
+                    Allure.addAttachment("Video", "video/mp4",
+                            new ByteArrayInputStream(Base64.getDecoder().decode(videoBase64)), ".mp4");
+                }
+
+
+                byte[] screenshotBytes = com.codeborne.selenide.Selenide.screenshot("final_screenshot").getBytes();
                 Allure.addAttachment("Final Screenshot", new ByteArrayInputStream(screenshotBytes));
             } catch (Exception e) {
-                System.out.println("Не удалось сделать скриншот: " + e.getMessage());
+                System.out.println("Не удалось остановить запись видео или сделать скриншот: " + e.getMessage());
             }
         }
         closeWebDriver();
