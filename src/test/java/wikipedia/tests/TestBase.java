@@ -32,6 +32,42 @@ public class TestBase {
         Configuration.savePageSource = false;
     }
 
+    //    @BeforeEach
+//    void beforeEach() {
+//        SelenideLogger.addListener("AllureSelenide", new AllureSelenide()
+//                .screenshots(true)
+//                .savePageSource(false));
+//
+//        com.codeborne.selenide.Selenide.open();
+//
+//        try {
+//            ((AndroidDriver) WebDriverRunner.getWebDriver()).startRecordingScreen();
+//        } catch (Exception e) {
+//            System.out.println("Не удалось начать запись видео: " + e.getMessage());
+//        }
+//    }
+//
+//    @AfterEach
+//    void afterEach() {
+//        if (WebDriverRunner.hasWebDriverStarted()) {
+//            try {
+//
+//                String videoBase64 = ((AndroidDriver) WebDriverRunner.getWebDriver()).stopRecordingScreen();
+//                if (videoBase64 != null && !videoBase64.isEmpty()) {
+//                    Allure.addAttachment("Video", "video/mp4",
+//                            new ByteArrayInputStream(Base64.getDecoder().decode(videoBase64)), ".mp4");
+//                }
+//
+//
+//                byte[] screenshotBytes = com.codeborne.selenide.Selenide.screenshot("final_screenshot").getBytes();
+//                Allure.addAttachment("Final Screenshot", new ByteArrayInputStream(screenshotBytes));
+//            } catch (Exception e) {
+//                System.out.println("Не удалось остановить запись видео или сделать скриншот: " + e.getMessage());
+//            }
+//        }
+//        closeWebDriver();
+//    }
+//}
     @BeforeEach
     void beforeEach() {
         SelenideLogger.addListener("AllureSelenide", new AllureSelenide()
@@ -40,10 +76,12 @@ public class TestBase {
 
         com.codeborne.selenide.Selenide.open();
 
-        try {
-            ((AndroidDriver) WebDriverRunner.getWebDriver()).startRecordingScreen();
-        } catch (Exception e) {
-            System.out.println("Не удалось начать запись видео: " + e.getMessage());
+        if (!"browserstack".equals(System.getProperty("deviceHost"))) {
+            try {
+                ((AndroidDriver) WebDriverRunner.getWebDriver()).startRecordingScreen();
+            } catch (Exception e) {
+                System.out.println("Не удалось начать запись видео: " + e.getMessage());
+            }
         }
     }
 
@@ -51,13 +89,14 @@ public class TestBase {
     void afterEach() {
         if (WebDriverRunner.hasWebDriverStarted()) {
             try {
-
-                String videoBase64 = ((AndroidDriver) WebDriverRunner.getWebDriver()).stopRecordingScreen();
-                if (videoBase64 != null && !videoBase64.isEmpty()) {
-                    Allure.addAttachment("Video", "video/mp4",
-                            new ByteArrayInputStream(Base64.getDecoder().decode(videoBase64)), ".mp4");
+                // НЕ ОСТАНАВЛИВАЕМ ВИДЕО, ЕСЛИ МЫ В БРАУЗЕРСТЕКЕ
+                if (!"browserstack".equals(System.getProperty("deviceHost"))) {
+                    String videoBase64 = ((AndroidDriver) WebDriverRunner.getWebDriver()).stopRecordingScreen();
+                    if (videoBase64 != null && !videoBase64.isEmpty()) {
+                        Allure.addAttachment("Video", "video/mp4",
+                                new ByteArrayInputStream(Base64.getDecoder().decode(videoBase64)), ".mp4");
+                    }
                 }
-
 
                 byte[] screenshotBytes = com.codeborne.selenide.Selenide.screenshot("final_screenshot").getBytes();
                 Allure.addAttachment("Final Screenshot", new ByteArrayInputStream(screenshotBytes));

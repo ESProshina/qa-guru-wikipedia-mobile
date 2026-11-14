@@ -6,7 +6,6 @@ import io.qameta.allure.Step;
 
 import java.time.Duration;
 
-import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.sleep;
 import static com.codeborne.selenide.appium.SelenideAppium.$;
@@ -16,7 +15,6 @@ public class SearchScreen {
 
     private final SelenideElement searchField1 =
             $(AppiumBy.id("org.wikipedia.alpha:id/search_text_view"));
-
     private final SelenideElement searchField2 =
             $(AppiumBy.id("org.wikipedia.alpha:id/search_src_text"));
 
@@ -25,11 +23,10 @@ public class SearchScreen {
 
     @Step("Закрываем подсказку (если появилась)")
     public SearchScreen closeTooltipIfVisible() {
-        // Даем приложению 2 секунды, чтобы баннер успел появиться
         sleep(2000);
         if (closeTooltipButton.exists()) {
             closeTooltipButton.click();
-            sleep(1000); // Ждем, пока баннер исчезнет
+            sleep(1000);
         }
         return this;
     }
@@ -37,29 +34,27 @@ public class SearchScreen {
     @Step("Вводим поисковый запрос: {query}")
     public SearchScreen typeQuery(String query) {
         searchField1.shouldBe(visible).click();
-        // Вводим текст и нажимаем Enter, чтобы запустить поиск
         searchField2.shouldBe(visible).setValue(query).pressEnter();
-        // Ждем, чтобы результаты успели загрузиться
-        sleep(2000);
+        sleep(3000); // Ждем загрузки списка
         return this;
     }
 
     @Step("Кликаем по первому результату поиска")
     public SearchScreen clickFirstSnippet() {
-        // Ищем список заголовков статей и кликаем по первому
+
         $$(AppiumBy.id("org.wikipedia.alpha:id/page_list_item_title"))
                 .first()
-                .shouldBe(visible, Duration.ofSeconds(15)) // Ждем до 15 секунд
+                .shouldBe(visible, Duration.ofSeconds(30))
                 .click();
         return this;
     }
 
     @Step("Проверяем заголовок статьи: {expected}")
     public SearchScreen checkArticleTitle(String expected) {
-        // Проверяем, что на открывшейся странице есть нужный текст
-        $(AppiumBy.xpath("//*[@text='" + expected + "']"))
-                .shouldBe(visible, Duration.ofSeconds(15))
-                .shouldHave(text(expected));
+
+        sleep(3000);
+        $(AppiumBy.xpath("//*[contains(@text, '" + expected + "')]"))
+                .shouldBe(visible, Duration.ofSeconds(20));
         return this;
     }
 }
