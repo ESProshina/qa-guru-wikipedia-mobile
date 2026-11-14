@@ -1,4 +1,5 @@
 # Wikipedia Mobile Automation (Дипломный проект QA.GURU)
+[![Jenkins](https://img.shields.io/badge/Jenkins-CI%2FCD-blue)](https://jenkins.qa.guru/view/java_students/job/ESPro-wikipedia-mobile1/)
 
 Мобильные автотесты для Android-приложения **Wikipedia** (Alpha версия).
 Проект вынесен в отдельный независимый репозиторий в соответствии с требованиями к дипломной работе.
